@@ -1,1 +1,54 @@
-Trypillia - WebGL build coming soon.
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#4b4b4b">
+  <title>Трипільська гра</title>
+  <style>
+    html,body{margin:0;padding:0;height:100%;background:#3f7a2a;overflow:hidden;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#fff;-webkit-text-size-adjust:100%}
+    #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+    /* портретная игра: канвас занимает экран, на десктопе — рамка телефона */
+    #unity-canvas{background:#3f7a2a;display:block;width:100%;height:100%;max-width:min(100vw,calc(100vh*0.462));max-height:100vh;touch-action:none}
+    #loader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#3f7a2a;z-index:5}
+    #bar{width:min(70vw,320px);height:14px;border-radius:8px;background:rgba(0,0,0,.25);overflow:hidden}
+    #fill{height:100%;width:0;background:#58cc02;transition:width .2s}
+    #title{font-size:22px;font-weight:700;letter-spacing:.5px}
+    #hint{font-size:14px;opacity:.85;max-width:280px;text-align:center;line-height:1.4}
+    #err{position:fixed;left:12px;right:12px;bottom:12px;background:#ff4b4b;border-radius:12px;padding:12px;font-size:13px;display:none;z-index:9}
+  </style>
+</head>
+<body>
+  <div id="wrap"><canvas id="unity-canvas" tabindex="-1"></canvas></div>
+  <div id="loader">
+    <div id="title">Трипільська гра</div>
+    <div id="bar"><div id="fill"></div></div>
+    <div id="hint">Прототип. Завантаження може зайняти хвилину — гра важить кілька десятків мегабайт.</div>
+  </div>
+  <div id="err"></div>
+  <script>
+    var canvas = document.querySelector("#unity-canvas");
+    var loader = document.querySelector("#loader"), fill = document.querySelector("#fill"), errBox = document.querySelector("#err");
+    var config = {
+      dataUrl: "Build/WebGL.data.unityweb",
+      frameworkUrl: "Build/WebGL.framework.js.unityweb",
+      codeUrl: "Build/WebGL.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "DefaultCompany",
+      productName: "Trypillia",
+      productVersion: "0.1.0",
+      showBanner: function (msg, type) { if (type === "error") { errBox.style.display = "block"; errBox.textContent = msg; } }
+    };
+    var script = document.createElement("script");
+    script.src = "Build/WebGL.loader.js";
+    script.onload = function () {
+      createUnityInstance(canvas, config, function (p) { fill.style.width = (p * 100) + "%"; })
+        .then(function () { loader.style.display = "none"; })
+        .catch(function (message) { errBox.style.display = "block"; errBox.textContent = message; });
+    };
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>
